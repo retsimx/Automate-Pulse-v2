@@ -29,8 +29,17 @@ class AutomateBase(entity.Entity):
 
     @property
     def available(self) -> bool:
-        """Return True if roller and hub is available."""
-        return self.roller.online and self.roller.hub.connected
+        """Return True if the roller's hub connection is up.
+
+        The hub's per-roller ``ol`` (online) flag is unreliable on several motor
+        firmware versions: it frequently reports a reachable motor as offline
+        while the motor still responds to commands. Trusting it flaps the entity
+        to ``unavailable`` (and Google Home to ``offline``) for working blinds.
+        Gate availability on the hub link only.
+
+        See https://github.com/sillyfrog/aiopulse2/issues/2
+        """
+        return self.roller.hub.connected
 
     # pylint: disable=no-self-use
     def include_entity(self) -> bool:
